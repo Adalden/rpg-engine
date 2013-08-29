@@ -1,6 +1,7 @@
 /* jshint node:true, strict:false */
 var request = require('request'),
-      couch = require('config').couch;
+      couch = require('config').couch,
+    gameUrl = require('config').gameUrl;
 
 module.exports = function (app) {
   app.post('/map', saveMap);
@@ -8,7 +9,6 @@ module.exports = function (app) {
 };
 
 var couchUrl = 'http://' + couch.host + ':' + couch.port + '/' + couch.db.maps;
-var gameUrl = 'http://rpg-engine.aws.af.cm/simulate.html';
 
 // -+-+ Public Functions +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 

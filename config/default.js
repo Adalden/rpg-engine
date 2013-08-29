@@ -7,5 +7,6 @@ module.exports = {
       maps: 'usu_maps',
       groups: 'usu_groups'
     }
-  }
+  },
+  gameUrl: 'http://localhost:4000/simulate.html'
 };

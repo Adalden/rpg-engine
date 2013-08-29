@@ -4,7 +4,7 @@ var       fs = require('fs'),
       stylus = require('stylus');
 
 var app = express();
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 4000);
 
 var sessOptions = {
   key: 'rpg-engine.sid',
