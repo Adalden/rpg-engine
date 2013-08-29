@@ -3,12 +3,12 @@ var request = require('request'),
       couch = require('config').couch;
 
 module.exports = function (app) {
-  app.post('/simulate/map', saveMap);
-  app.get('/simulate/map/:id', getMap);
+  app.post('/map', saveMap);
+  app.get('/map/:id', getMap);
 };
 
 var couchUrl = 'http://' + couch.host + ':' + couch.port + '/' + couch.db.maps;
-var gameUrl = 'http://rpg-engine.aws.af.cm/simulate/play';
+var gameUrl = 'http://rpg-engine.aws.af.cm/simulate.html';
 
 // -+-+ Public Functions +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
