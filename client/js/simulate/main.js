@@ -1,24 +1,12 @@
 /* global requirejs, define, $, console */
-
-function getParameterByName(name) {
-  'use strict';
-
-  name = name.replace(/[\[]/, '\\\[').replace(/[\]]/, '\\\]');
-  var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-  var results = regex.exec(location.search);
-  return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-}
-
 requirejs.config({
   paths: {
     text: '/js/lib/text'
   }
 });
 
-define([], function () {
+define(['tools', 'game-engine'], function (tools, gameEngine) {
   'use strict';
-
-  init();
 
   function init() {
     getMap(function (err, map) {
@@ -30,16 +18,17 @@ define([], function () {
         return;
       }
 
-      $('.err').text(JSON.stringify(map));
+      tools.loadImages(function () {
+        gameEngine.init(map);
+        gameEngine.start();
+      });
 
-      // load the images
-      // grab the canvi
-      // load the game!!
+      $('.err').remove();
     });
   }
 
   function getMap(cb) {
-    var id = getParameterByName('id');
+    var id = tools.getQS('id');
     if (!id) return cb('No ID was given.');
 
     $.get('/map/' + id, function (data) {
@@ -50,4 +39,6 @@ define([], function () {
       cb(null, data.map);
     });
   }
+
+  init();
 });
