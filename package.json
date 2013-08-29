@@ -1,0 +1,14 @@
+{
+  "name": "rpg-engine",
+  "version": "0.0.1",
+  "private": false,
+  "scripts": {
+    "start": "node server/app"
+  },
+  "dependencies": {
+    "express": "3.0.4",
+    "stylus": "*",
+    "config": "~0.4.29",
+    "request": "~2.27.0"
+  }
+}
