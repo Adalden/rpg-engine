@@ -12,7 +12,7 @@ define(['text!tmpl/play-maps.html', 'text!tmpl/play-maps-list.html'], function (
         playMapsListTmpl = playMapsListTmpl({ err: resp.err });
       }
       else {
-        playMapsListTmpl = playMapsListTmpl({ maps: resp.maps, url: resp.baseUrl });
+        playMapsListTmpl = playMapsListTmpl({ maps: resp.maps });
       }
       finished = true;
       $('.za-map-container').html(playMapsListTmpl);

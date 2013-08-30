@@ -27,8 +27,7 @@ function getMaps(req, res) {
 
     res.send({
       success: true,
-      maps: maps,
-      baseUrl: gameUrl
+      maps: maps
     });
   });
 }
