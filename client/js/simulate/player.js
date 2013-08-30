@@ -26,6 +26,9 @@ define(['shared', 'input'], function (shared, inp) {
   var curDir = 0;
 
   function init(_canvas, _map) {
+    x = (_map.x || 0) * 40;
+    y = (_map.y || 0) * 40;
+
     canvas = _canvas;
     inp.init();
     img = shared.get('img').player;
