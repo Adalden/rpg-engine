@@ -51,9 +51,10 @@ define([
 
   var hash = window.location.hash || '#Home';
   hash = hash.substr(1);
+  hash = hash.replace(/%20/g, ' ');
 
   var el = $('.za-container');
-  var cur = ctrls[hash];
+  var cur = ctrls[hash] || ctrls.Home;
   cur.render(el);
   var btn = _.find($('.za-nav-btn'), function (btn) {
     return $(btn).text() == hash;
