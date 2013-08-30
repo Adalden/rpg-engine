@@ -1,7 +1,6 @@
 /* jshint node:true */
 var request = require('request'),
       couch = require('config').couch,
-    gameUrl = require('config').gameUrl,
           _ = require('underscore');
 
 var couchUrl = 'http://' + couch.host + ':' + couch.port + '/' + couch.db.maps;
@@ -52,7 +51,8 @@ function getMapsFromCouch(cb) {
     var rows = _.map(body.rows, function (row) {
       return {
         id: row.id,
-        name: row.doc.title || 'untitled map'
+        name: row.doc.title || 'untitled map',
+        author: row.doc.author || 'unknown'
       };
     });
 

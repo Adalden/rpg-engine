@@ -35,12 +35,15 @@ function saveMap(req, res) {
     report = '<div class="success">Congrats. Your map JSON is valid</div>';
   }
 
+  map.created = new Date();
+  // group
+
   saveMapToCouch(map, function (err, id) {
     if (err) {
       console.error(err);
       res.send({
         success: false,
-        info: 'This was probably a CouchDB error. Tell the TA (dosmun@aggiemail.usu.edu',
+        info: 'This was probably a CouchDB error. Tell the TA (dosmun@aggiemail.usu.edu)',
         err: err
       });
       return;
@@ -56,6 +59,9 @@ function saveMap(req, res) {
 
 function getMap(req, res) {
   var id = req.params.id;
+
+  // last_played
+  // play_count
 
   getMapFromCouch(id, function (err, map) {
     if (err) {
@@ -106,6 +112,13 @@ function genReport(map) {
   }
   else if (typeof map.title !== 'string') {
     report += '<p>map.title should be a string.</p>';
+  }
+
+  if (!map.author) {
+    report += '<p>Your map doesn\'t have a author. Might be nice if you need to display stuff to a user.</p>';
+  }
+  else if (typeof map.author !== 'string') {
+    report += '<p>map.author should be a string.</p>';
   }
 
   if (!map.width) {
