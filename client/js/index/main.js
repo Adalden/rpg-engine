@@ -1,6 +1,4 @@
-/* global requirejs, define, $ */
-
-function noop() {}
+/* global requirejs, define, $, _ */
 
 requirejs.config({
   paths: {
@@ -9,60 +7,56 @@ requirejs.config({
 });
 
 define([
-  'text!tmpl/home.html',
-  'text!tmpl/high-scores.html',
-  'text!tmpl/screenshots.html',
-  'text!tmpl/github.html'
+  'ctrl/home',
+  'ctrl/play-maps',
+  'ctrl/screenshots',
+  'ctrl/high-scores',
+  'ctrl/github',
 ], function (
-  homeTmpl,
-  scoresTmpl,
-  screensTmpl,
-  githubTmpl
+  homeCtrl,
+  playMapsCtrl,
+  screenshotsCtrl,
+  highScoresCtrl,
+  githubCtrl
 ) {
   'use strict';
 
-  var mapping = {
-    Home: {
-      tmpl: homeTmpl,
-      bind: bindHome
-    },
-    'High Scores': {
-      tmpl: scoresTmpl,
-      bind: noop
-    },
-    Screenshots: {
-      tmpl: screensTmpl,
-      bind: noop
-    },
-    Github: {
-      tmpl: githubTmpl,
-      bind: noop
-    }
-  };
-
-  function setup() {
-    $('.za-nav-btn').click(function () {
-      var $this = $(this);
-      var obj = mapping[$this.text()];
-      clickedItem($this, obj);
-    });
-
-    $('.za-container').html(mapping.Home.tmpl);
-    mapping.Home.bind();
-  }
-
-  function bindHome() {
-    $('.za-screens').click(function () {
-      clickedItem($('.za-nav-screens'), mapping.Screenshots);
-    });
-  }
-
-  function clickedItem($this, obj) {
+  function navigate($this) {
+    var ctrl = ctrls[$this.text()];
+    if (cur === ctrl) return;
     $('.active').removeClass('active');
     $this.addClass('active');
-    $('.za-container').html(obj.tmpl);
-    obj.bind();
+
+    cur.destroy();
+    ctrl.render(el);
+    cur = ctrl;
   }
 
-  setup();
+  var ctrls = {
+    Home: homeCtrl,
+    'Play Maps': playMapsCtrl,
+    Screenshots: screenshotsCtrl,
+    'High Scores': highScoresCtrl,
+    Github: githubCtrl
+  };
+
+  _.each(ctrls, function (ctrl) {
+    ctrl.init(navigate);
+  });
+
+  $('.za-nav-btn').click(function () {
+    var $this = $(this);
+    navigate($this);
+  });
+
+  var hash = window.location.hash || '#Home';
+  hash = hash.substr(1);
+
+  var el = $('.za-container');
+  var cur = ctrls[hash];
+  cur.render(el);
+  var btn = _.find($('.za-nav-btn'), function (btn) {
+    return $(btn).text() == hash;
+  });
+  $(btn).addClass('active');
 });

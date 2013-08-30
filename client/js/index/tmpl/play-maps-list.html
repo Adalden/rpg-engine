@@ -1,0 +1,13 @@
+{{#if maps}}
+  <p>Maps</p>
+  <ul>
+    {{#each maps}}
+      <li><a href="{{../url}}?id={{id}}" target="_blank">{{name}}</a></li>
+    {{/each}}
+  </ul>
+{{/if}}
+
+{{#if err}}
+  <p>ERROR</p>
+  {{err}}
+{{/if}}

@@ -1,5 +1,5 @@
 {
-  "name": "rpg-engine",
+  "name": "zombie-attack",
   "version": "0.0.1",
   "private": false,
   "scripts": {
@@ -9,6 +9,7 @@
     "express": "3.0.4",
     "stylus": "*",
     "config": "~0.4.29",
-    "request": "~2.27.0"
+    "request": "~2.27.0",
+    "underscore": "~1.5.1"
   }
 }
