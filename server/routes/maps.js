@@ -48,14 +48,24 @@ function getMapsFromCouch(cb) {
       return cb(body);
     }
 
-    var rows = _.map(body.rows, function (row) {
-      return {
+    var rows = {};
+
+    _.each(body.rows, function (row) {
+      rows[row.doc.group] = rows[row.doc.group] || [];
+      rows[row.doc.group].push({
         id: row.id,
         name: row.doc.title || 'untitled map',
         author: row.doc.author || 'unknown'
+      });
+    });
+
+    var arr = _.map(rows, function (row, key) {
+      return {
+        name: key,
+        items: row
       };
     });
 
-    cb(null, rows);
+    cb(null, arr);
   });
 }

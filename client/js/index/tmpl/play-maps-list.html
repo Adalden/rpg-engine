@@ -1,9 +1,12 @@
 {{#if maps}}
-  <ul>
-    {{#each maps}}
-      <li><a href="/simulate.html?id={{id}}" target="_blank">{{name}}</a> by {{author}}</li>
-    {{/each}}
-  </ul>
+  {{#each maps}}
+    <h3>{{name}}</h3>
+    <ul>
+      {{#each items}}
+        <li><a href="/simulate.html?id={{id}}" target="_blank">{{name}}</a> by {{author}}</li>
+      {{/each}}
+    </ul>
+  {{/each}}
 {{/if}}
 
 {{#if err}}
