@@ -1,10 +1,11 @@
 /* jshint node:true, strict:false */
 var request = require('request'),
       couch = require('config').couch,
-    gameUrl = require('config').gameUrl;
+    gameUrl = require('config').gameUrl,
+     tokens = require('config').tokens;
 
 module.exports = function (app) {
-  app.post('/map', saveMap);
+  app.post('/uploadMap/:token', saveMap);
   app.get('/map/:id', getMap);
 };
 
@@ -13,6 +14,16 @@ var couchUrl = 'http://' + couch.host + ':' + couch.port + '/' + couch.db.maps;
 // -+-+ Public Functions +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
 function saveMap(req, res) {
+  var token = req.params.token;
+
+  if (!tokens[token]) {
+    res.send({
+      success: false,
+      err: 'Invalid Token!!'
+    });
+    return;
+  }
+
   var map = req.body.map;
 
   var err = validate(map);
@@ -36,7 +47,7 @@ function saveMap(req, res) {
   }
 
   map.created = new Date();
-  // group
+  map.group = tokens[token];
 
   saveMapToCouch(map, function (err, id) {
     if (err) {
@@ -60,9 +71,6 @@ function saveMap(req, res) {
 function getMap(req, res) {
   var id = req.params.id;
 
-  // last_played
-  // play_count
-
   getMapFromCouch(id, function (err, map) {
     if (err) {
       console.error(err);
@@ -72,6 +80,14 @@ function getMap(req, res) {
       });
       return;
     }
+
+    map.last_played = new Date();
+    map.play_count = map.play_count || 0;
+    map.play_count++;
+
+    updateMapInCouch(map);
+
+    delete map._rev;
 
     res.send({
       success: true,
@@ -187,8 +203,16 @@ function getMapFromCouch(id, cb) {
       return cb(body);
     }
 
-    delete body._rev;
-
     cb(null, body);
+  });
+}
+
+function updateMapInCouch(map) {
+  request.put({
+    url: couchUrl + '/' + map._id,
+    json: map
+  }, function (err, resp, body) {
+    console.error(err);
+    console.log(body);
   });
 }

@@ -1,8 +1,7 @@
 {{#if maps}}
-  <p>Maps</p>
   <ul>
     {{#each maps}}
-      <li><a href="/simulate.html?id={{id}}" target="_blank">{{name}}</a></li>
+      <li><a href="/simulate.html?id={{id}}" target="_blank">{{name}}</a> by {{author}}</li>
     {{/each}}
   </ul>
 {{/if}}

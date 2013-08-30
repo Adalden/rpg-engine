@@ -8,5 +8,8 @@ module.exports = {
       groups: 'usu_groups'
     }
   },
-  gameUrl: 'http://localhost:4000/simulate.html'
+  gameUrl: 'http://localhost:4000/simulate.html',
+  tokens: {
+    '12345': 'Test Group'
+  }
 };
