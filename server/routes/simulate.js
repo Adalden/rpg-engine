@@ -2,7 +2,8 @@
 var request = require('request'),
       couch = require('config').couch,
     gameUrl = require('config').gameUrl,
-     tokens = require('config').tokens;
+     tokens = require('config').tokens,
+          _ = require('underscore');
 
 module.exports = function (app) {
   app.post('/uploadMap/:token', saveMap);
@@ -48,6 +49,7 @@ function saveMap(req, res) {
 
   map.created = new Date();
   map.group = tokens[token];
+  map.debug = report;
 
   saveMapToCouch(map, function (err, id) {
     if (err) {
@@ -107,7 +109,7 @@ function validate(map) {
     return 'Your map didn\'t contain a data property.';
   }
 
-  if (typeof map.data !== 'object') {
+  if (!_.isObject(map.data)) {
     return 'map.data should be an object.';
   }
 
@@ -115,9 +117,37 @@ function validate(map) {
     return 'Your map\'s data didn\'t contain a bottom property.';
   }
 
-  // verify the contents of map.data.bottom
+  if (!_.isArray(map.data.bottom)) {
+    return 'map.data.bottom should be an array.';
+  }
 
-  return false;
+  if (!map.data.bottom.length) {
+    return 'map.data.bottom should have something in it.';
+  }
+
+  if (!_.isArray(map.data.bottom[0])) {
+    return 'map.data.bottom[0] should be an array at the very least.';
+  }
+
+  var err = false;
+  _.each(map.data.bottom, function (row, i) {
+    if (err) return;
+
+    if (!_.isArray(row)) {
+      err = 'map.data.bottom[' + i + '] should be an array';
+      return;
+    }
+
+    _.each(row, function (cell, j) {
+      if (err) return;
+      if (cell && !_.isNumber(cell)) {
+        err = 'map.data.bottom[' + i + '][' + j + '] should be a number or null.';
+        return;
+      }
+    });
+  });
+
+  return err;
 }
 
 function genReport(map) {
@@ -126,43 +156,58 @@ function genReport(map) {
   if (!map.title) {
     report += '<p>Your map doesn\'t have a title. Might be nice if you need to display stuff to a user.</p>';
   }
-  else if (typeof map.title !== 'string') {
+  else if (!_.isString(map.title)) {
     report += '<p>map.title should be a string.</p>';
   }
 
   if (!map.author) {
     report += '<p>Your map doesn\'t have a author. Might be nice if you need to display stuff to a user.</p>';
   }
-  else if (typeof map.author !== 'string') {
+  else if (!_.isString(map.author)) {
     report += '<p>map.author should be a string.</p>';
   }
 
   if (!map.width) {
     report += '<p>Your Map doesn\'t have a width. Not really important in Javascript, but it helps in other inferior languages ;).</p>';
   }
-  else if (typeof map.width !== 'number') {
+  else if (!_.isNumber(map.width)) {
     report += '<p>map.width should be a number.</p>';
   }
 
   if (!map.height) {
     report += '<p>Your Map doesn\'t have a height. Not really important in Javascript, but it helps in other inferior languages ;).</p>';
   }
-  else if (typeof map.height !== 'number') {
+  else if (!_.isNumber(map.height)) {
     report += '<p>map.height should be a number.</p>';
+  }
+
+  if (!map.x) {
+    report += '<p>Your Map doesn\'t have an x property. Player will start at column 0.</p>';
+  }
+  else if (!_.isNumber(map.x)) {
+    report += '<p>map.x should be a number.</p>';
+  }
+
+  if (!map.y) {
+    report += '<p>Your Map doesn\'t have a y property. Player will start at row 0.</p>';
+  }
+  else if (!_.isNumber(map.y)) {
+    report += '<p>map.y should be a number.</p>';
   }
 
   if (!map.env) {
     report += '<p>Your Map doesn\'t have an env. Assuming Normal.</p>';
   }
-  else if (typeof map.env !== 'string') {
+  else if (!_.isString(map.env)) {
     report += '<p>map.env should be a string.</p>';
   }
 
   if (!map.events) {
     report += '<p>Your Map doesn\'t have an events array. None will be loaded.</p>';
   }
-
-  // verify the inside of events
+  else {
+    // verify the inside of events
+  }
 
   // verify data.middle and data.top too
 
