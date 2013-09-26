@@ -1,4 +1,4 @@
-/* global define, _ */
+/* global define, _, $ */
 define(['shared', 'input'], function (shared, inp) {
   'use strict';
 
@@ -24,6 +24,10 @@ define(['shared', 'input'], function (shared, inp) {
   var curFrame = 0;
   var animTime = 0;
   var curDir = 0;
+
+  var SCREEN_WIDTH = 600;
+  var SCREEN_HEIGHT = 600;
+  var TILESIZE = 40;
 
   function init(_canvas, _map) {
     x = (_map.x || 0) * 40;
@@ -93,21 +97,70 @@ define(['shared', 'input'], function (shared, inp) {
       return false;
     }
 
-    // TODO:: 600 is hard coded, put in map w and h * 40
-    if (x > map.width * 40 - WIDTH) {
-      x = map.width * 40 - WIDTH;
+    if (x > SCREEN_WIDTH - WIDTH) {
+      x = SCREEN_WIDTH - WIDTH;
       return false;
     }
 
-    if (y > map.height * 40 - HEIGHT) {
-      y = map.height * 40 - HEIGHT;
+    // if (x > map.width * TILESIZE - WIDTH) {
+    //   x = map.width * TILESIZE - WIDTH;
+    //   return false;
+    // }
+
+    if (y > SCREEN_HEIGHT - HEIGHT) {
+      y = SCREEN_HEIGHT - HEIGHT;
       return false;
     }
+
+    // if (y > map.height * TILESIZE - HEIGHT) {
+    //   y = map.height * TILESIZE - HEIGHT;
+    //   return false;
+    // }
 
     if (isCollision()) {
       x = oldX;
       y = oldY;
       return false;
+    }
+
+    if (x > SCREEN_WIDTH / 2) {
+      var oldPos = $('.move-me').position();
+
+      if (oldPos.left >= -(map.width * TILESIZE - SCREEN_WIDTH)) {
+        x = oldX;
+        var newLeft = oldPos.left - dx * SPEED;
+        $('.move-me').css('left', newLeft + 'px');
+      }
+    }
+
+    if (x < SCREEN_WIDTH / 2) {
+      var oldPos = $('.move-me').position();
+
+      if (oldPos.left < 0) {
+        x = oldX;
+        var newLeft = oldPos.left - dx * SPEED;
+        $('.move-me').css('left', newLeft + 'px');
+      }
+    }
+
+    if (y > SCREEN_HEIGHT / 2) {
+      var oldPos = $('.move-me').position();
+
+      if (oldPos.top >= -(map.height * TILESIZE - SCREEN_HEIGHT)) {
+        y = oldY;
+        var newTop = oldPos.top - dy * SPEED;
+        $('.move-me').css('top', newTop + 'px');
+      }
+    }
+
+    if (y < SCREEN_HEIGHT / 2) {
+      var oldPos = $('.move-me').position();
+
+      if (oldPos.top < 0) {
+        y = oldY;
+        var newTop = oldPos.top - dy * SPEED;
+        $('.move-me').css('top', newTop + 'px');
+      }
     }
 
     return true;
@@ -118,7 +171,7 @@ define(['shared', 'input'], function (shared, inp) {
     _.each(map.events, function (e) {
       if (_collision) return;
       if (e.id) {
-        if (collides(x, y, e.x*40, e.y*40)) {
+        if (collides(x, y, e.x * TILESIZE, e.y * TILESIZE)) {
           _collision = true;
         }
       }

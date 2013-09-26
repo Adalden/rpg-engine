@@ -9,3 +9,9 @@ canvas {
   text-align: center;
   margin-top: 100px;
 }
+.game-area {
+  overflow: hidden;
+  position: absolute;
+  width: 600px;
+  height: 600px;
+}

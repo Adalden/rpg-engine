@@ -10,7 +10,9 @@ define(['shared', 'player'], function (shared, player) {
   var map;
 
   function init(_map) {
-    setupContexts(_map.width, _map.height);
+    var w =_map.width || _map.data.bottom.length;
+    var h = _map.height || _map.data.bottom[0].length;
+    setupContexts(w, h);
     var playerCanvas = document.getElementById('player');
     map = _map;
     player.init(playerCanvas, map);
@@ -40,6 +42,7 @@ define(['shared', 'player'], function (shared, player) {
 
   function update() {
     player.update();
+
   }
 
   function render() {

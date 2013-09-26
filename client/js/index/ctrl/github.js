@@ -20,8 +20,8 @@ define(['text!tmpl/github.html'], function (githubTmpl) {
 
   function createDummyData() {
     var repos = [
-      { name: 'Engine', code: 'http://github.com/Adalden/rpg-engine' },
-      { name: 'Instructors', demo: '#', code: '#' }
+      { name: 'Engine', code: 'https://github.com/numso/zombie-attack' },
+      { name: 'Instructors', demo: 'http://rpg-map-editor.aws.af.cm/#/', code: 'https://github.com/numso/rpg-map-editor' }
     ];
 
     for (var i = 1; i <= 10; ++i) {

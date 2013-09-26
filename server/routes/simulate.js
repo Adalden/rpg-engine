@@ -141,8 +141,10 @@ function validate(map) {
     _.each(row, function (cell, j) {
       if (err) return;
       if (cell && !_.isNumber(cell)) {
-        err = 'map.data.bottom[' + i + '][' + j + '] should be a number or null.';
-        return;
+        if (isNaN(parseInt(cell, 10))) {
+          err = 'map.data.bottom[' + i + '][' + j + '] should be a number or null.';
+          return;
+        }
       }
     });
   });
