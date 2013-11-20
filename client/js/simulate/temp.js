@@ -41,6 +41,7 @@ var stage;
 var time;
 var map;
 var dMap;
+var upLyr;
 var player = { bottom: true, left: true, right: true, top: true };
 var curDir;
 
@@ -120,11 +121,13 @@ function createGameBoard() {
         lyr.addChild(tempSprite);
       }
     }
-    dMap.addChild(lyr);
+    if (key === 'top') upLyr = lyr;
+    else dMap.addChild(lyr);
   }
   if (!map.data.middle) map.data.middle = [];
 
   stage.addChild(dMap);
+  if (upLyr) stage.addChild(upLyr);
   MAPWIDTH = map.data.bottom[0].length * SIZE;
   MAPHEIGHT = map.data.bottom.length * SIZE;
 }
@@ -154,7 +157,7 @@ function createPlayer() {
   if (playerX < 0) playerX = 0;
   if (playerY < 0) playerY = 0;
 
-  stage.addChild(sprite);
+  stage.addChildAt(sprite, 1);
   player.spr = sprite;
   curDir = 'left';
   player[curDir].visible = true;
@@ -246,8 +249,8 @@ function checkBorders(x, y) {
 }
 
 function render() {
-  player.spr.position.x = playerX;
-  player.spr.position.y = playerY;
+  player.spr.position.x = Math.floor(playerX);
+  player.spr.position.y = Math.floor(playerY);
 }
 
 function getParameterByName(name) {
