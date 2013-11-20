@@ -143,6 +143,9 @@ function createPlayer() {
   playerX = 0;
   playerY = 0;
 
+  if (map.x) playerX = map.x * SIZE;
+  if (map.y) playerY = map.y * SIZE;
+
   stage.addChild(sprite);
   player.spr = sprite;
   curDir = 'left';
@@ -205,11 +208,33 @@ function move(dX, dY) {
 }
 
 function collides(x, y) {
+  if (checkBorders(x, y)) return true;
+
+  for (var i = 0; i < map.data.middle.length; ++i) {
+    for (var j = 0; j < map.data.middle[i].length; ++j) {
+      var m = map.data.middle[i][j];
+      if (m === null || m === undefined) continue;
+      if (m < 0 || m > 70) continue;
+      if (checkTile(x, y, PSIZE, PSIZE, j * SIZE, i * SIZE, SIZE, SIZE)) return true;
+    }
+  }
+  return false;
+}
+
+function checkTile(x, y, w, h, x2, y2, w2, h2) {
+  if (x < x2 + w2 && x2 < x + w) {
+    if (y < y2 + h2 && y2 < y + h) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function checkBorders(x, y) {
   if (x < 0) return true;
   if (y < 0) return true;
   if (x > MAPWIDTH - PSIZE) return true;
   if (y > MAPHEIGHT - PSIZE) return true;
-  return false;
 }
 
 function render() {
