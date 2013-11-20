@@ -122,6 +122,8 @@ function createGameBoard() {
     }
     dMap.addChild(lyr);
   }
+  if (!map.data.middle) map.data.middle = [];
+
   stage.addChild(dMap);
   MAPWIDTH = map.data.bottom[0].length * SIZE;
   MAPHEIGHT = map.data.bottom.length * SIZE;
@@ -145,6 +147,12 @@ function createPlayer() {
 
   if (map.x) playerX = map.x * SIZE;
   if (map.y) playerY = map.y * SIZE;
+
+  if (playerX > MAPWIDTH - PSIZE) playerX = MAPWIDTH - PSIZE;
+  if (playerY > MAPHEIGHT - PSIZE) playerY = MAPHEIGHT - PSIZE;
+
+  if (playerX < 0) playerX = 0;
+  if (playerY < 0) playerY = 0;
 
   stage.addChild(sprite);
   player.spr = sprite;
