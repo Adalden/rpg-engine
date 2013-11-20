@@ -10,8 +10,8 @@ define(['shared', 'player'], function (shared, player) {
   var map;
 
   function init(_map) {
-    var w =_map.width || _map.data.bottom.length;
-    var h = _map.height || _map.data.bottom[0].length;
+    var w =_map.width || _map.data.bottom[0].length;
+    var h = _map.height || _map.data.bottom.length;
     setupContexts(w, h);
     var playerCanvas = document.getElementById('player');
     map = _map;
@@ -73,7 +73,7 @@ define(['shared', 'player'], function (shared, player) {
         if (cell === null) return;
         var sx = cell % cols;
         var sy = Math.floor(cell / cols);
-        drawImage(ctx, img, sx, sy, i, j);
+        drawImage(ctx, img, sx, sy, j, i);
       });
     });
   }
