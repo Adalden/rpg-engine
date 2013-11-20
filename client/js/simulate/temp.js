@@ -124,12 +124,48 @@ function createGameBoard() {
     if (key === 'top') upLyr = lyr;
     else dMap.addChild(lyr);
   }
+
   if (!map.data.middle) map.data.middle = [];
+
+  map.events = map.events || [];
+  if (map.events.length) {
+    var evLyr = new PIXI.DisplayObjectContainer();
+    _.each(map.events, function (ev) {
+      if (!_.isObject(ev)) return;
+      if (ev.id === 'door') {
+        addEvent(evLyr, 'events-3', ev.x, ev.y);
+      } else if (ev.id === 'treasure') {
+        addEvent(evLyr, 'events-0', ev.x, ev.y, true);
+      } else if (ev.id === 'bush') {
+        addEvent(evLyr, 'events-1', ev.x, ev.y, true);
+      } else if (ev.id === 'hole') {
+        addEvent(evLyr, 'events-2', ev.x, ev.y);
+      }
+    });
+    dMap.addChild(evLyr);
+  }
+
 
   stage.addChild(dMap);
   if (upLyr) stage.addChild(upLyr);
   MAPWIDTH = map.data.bottom[0].length * SIZE;
   MAPHEIGHT = map.data.bottom.length * SIZE;
+}
+
+function addEvent(lyr, key, x, y, collidable) {
+  x = x || 0;
+  y = y || 0;
+
+  var spr = PIXI.Sprite.fromFrame(key);
+  spr.position.x = x * SIZE;
+  spr.position.y = y * SIZE;
+
+  if (collidable) {
+    map.data.middle[y] = map.data.middle[y] || [];
+    map.data.middle[y][x] = true;
+  }
+
+  lyr.addChild(spr);
 }
 
 function createPlayer() {
