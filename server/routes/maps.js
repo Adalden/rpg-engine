@@ -30,9 +30,7 @@ function getMaps(req, res) {
 function getMapsFromCouch(cb) {
   'use strict';
 
-//  http://localhost:5984/usu_maps/_design/_views/_view/byGroupAndName
-
-  request.get(couchUrl + '/_all_docs?include_docs=true', function (err, resp, body) {
+  request.get(couchUrl + '/_design/_views/_view/byGroupAndName?include_docs=true', function (err, resp, body) {
     if (err) {
       return cb(err);
     }
