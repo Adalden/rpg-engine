@@ -25,6 +25,7 @@ app.configure(
     app.use(express.methodOverride());
     app.use(express.cookieParser());
     app.use(express.session(sessOptions));
+    app.use(addFail);
     app.use(app.router);
     app.use(express.errorHandler());
   }
@@ -41,3 +42,13 @@ app.listen(app.get('port'),
     console.log('Express server listening on port ' + app.get('port') + ' in environment ' + app.get('env'));
   }
 );
+
+function addFail(req, res, next) {
+  res.fail = function (msg) {
+    res.send({
+      success: false,
+      err: msg
+    });
+  }
+  next();
+}

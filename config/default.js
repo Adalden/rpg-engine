@@ -4,7 +4,7 @@ module.exports = {
     host: 'localhost',
     port: '5984',
     db: {
-      maps: 'rpg_maps',
+      maps: 'usu_maps',
       groups: 'usu_groups'
     }
   },

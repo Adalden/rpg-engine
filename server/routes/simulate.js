@@ -8,6 +8,7 @@ var request = require('request'),
 module.exports = function (app) {
   app.post('/uploadMap/:token', saveMap);
   app.get('/map/:id', getMap);
+  app.get('/map/:grp/:name', getMapByGroup);
 };
 
 var couchUrl = 'http://' + couch.host + ':' + couch.port + '/' + couch.db.maps;
@@ -73,14 +74,11 @@ function saveMap(req, res) {
 function getMap(req, res) {
   var id = req.params.id;
 
-  getMapFromCouch(id, function (err, map) {
+  var url = couchUrl + '/' + id;
+  getMapFromCouch(url, function (err, map) {
     if (err) {
       console.error(err);
-      res.send({
-        success: false,
-        err: err
-      });
-      return;
+      return res.fail(err);
     }
 
     map.last_played = new Date();
@@ -94,6 +92,30 @@ function getMap(req, res) {
     res.send({
       success: true,
       map: map
+    });
+  });
+}
+
+function getMapByGroup(req, res) {
+  var grp = req.params.grp;
+  var name = req.params.name;
+
+  var url = couchUrl + '/_design/_views/_view/byGroupAndName?key=["' + grp + '","' + name + '"]';
+  getMapFromCouch(url, function (err, map) {
+    console.log(map);
+    if (err) {
+      console.error(err);
+      return res.fail(err);
+    }
+
+    if (map.rows.length === 0) return res.fail('map: ' + name + ' does not exist.');
+
+    var newMap = map.rows[0].value; // order it here
+    delete newMap._rev;
+
+    res.send({
+      success: true,
+      map: newMap
     });
   });
 }
@@ -235,20 +257,14 @@ function saveMapToCouch(map, cb) {
   });
 }
 
-function getMapFromCouch(id, cb) {
-  request.get(couchUrl + '/' + id, function (err, resp, body) {
-    if (err) {
-      return cb(err);
-    }
-    if (!body) {
-      return cb('body not found');
-    }
+function getMapFromCouch(url, cb) {
+  request.get(url, function (err, resp, body) {
+    if (err) return cb(err);
+    if (!body) return cb('body not found');
 
     body = JSON.parse(body);
 
-    if (body.error) {
-      return cb(body);
-    }
+    if (body.error) return cb(body);
 
     cb(null, body);
   });

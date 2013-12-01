@@ -1,7 +1,9 @@
-/* global PIXI, $, requestAnimationFrame, _ */
+/* global PIXI, $, requestAnimationFrame, _, Q */
 'use strict';
 
 window.requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function (cb) { setTimeout(cb, 1000 / 60); };
+
+var ALLMAPS = {};
 
 var SPEED = 0.3;
 
@@ -45,13 +47,27 @@ var upLyr;
 var player = { bottom: true, left: true, right: true, top: true };
 var curDir;
 
+function resetMap(id, x, y) {
+  if (id !== undefined) {
+    stage.removeChild(dMap);
+    if (upLyr) stage.removeChild(upLyr);
+    upLyr = undefined;
+
+    map = ALLMAPS[id];
+    createGameBoard();
+  }
+
+  playerX = x * SIZE;
+  playerY = y * SIZE;
+}
+
 function loadContent() {
   var assets = ['img/bottom.png', 'img/middle.png', '/img/top.png', '/img/player.png'];
   var loader = new PIXI.AssetLoader(assets);
   loader.onComplete = function () {
     loadMapTextures();
     loadPlayerTextures();
-    loadMap(function (err, aMap) {
+    loadMaps(function (err, aMap) {
       if (err) return $('.err').text(err);
       map = aMap;
       init();
@@ -96,13 +112,46 @@ function loadPlayerTextures() {
   }
 }
 
-function loadMap(cb) {
+function loadMaps(cb) {
   var id = getParameterByName('id');
   if (!id) return cb('No ID was given.');
-  $.get('/map/' + id, function (data) {
-    if (!data.success) return cb(JSON.stringify(data.err));
-    cb(null, data.map);
+
+  _loadMap(id).then(function (aMap) {
+    cb(null, aMap);
+  }, function (err) {
+    cb(err);
   });
+}
+
+function _loadMap(grp, name) {
+  var deferred = Q.defer();
+
+  var url = '/map/' + grp;
+  if (name) url += '/' + name;
+
+  $.get(url, function (data) {
+    if (!data.success) return deferred.reject(data.err);
+
+    var map = data.map;
+    ALLMAPS[map.title] = map;
+
+    map.events = map.events || [];
+    map.data.middle = map.data.middle || [];
+
+    var promises = [];
+    _.each(map.events, function (ev) {
+      if (ev.d_id && !ALLMAPS[ev.d_id])
+        promises.push(_loadMap(map.group, ev.d_id));
+    });
+
+    Q.all(promises).then(function () {
+      deferred.resolve(map);
+    }, function (err) {
+      deferred.reject(err);
+    });
+  });
+
+  return deferred.promise;
 }
 
 function createGameBoard() {
@@ -125,34 +174,32 @@ function createGameBoard() {
     else dMap.addChild(lyr);
   }
 
-  if (!map.data.middle) map.data.middle = [];
-
-  map.events = map.events || [];
   if (map.events.length) {
     var evLyr = new PIXI.DisplayObjectContainer();
     _.each(map.events, function (ev) {
+      ev.id = ev.id.toLowerCase();
       if (!_.isObject(ev)) return;
       if (ev.id === 'door') {
-        addEvent(evLyr, 'events-3', ev.x, ev.y);
+        addEvent(evLyr, 'events-3', ev.x, ev.y, ev);
       } else if (ev.id === 'treasure') {
-        addEvent(evLyr, 'events-0', ev.x, ev.y, true);
+        addEvent(evLyr, 'events-0', ev.x, ev.y, ev);
       } else if (ev.id === 'bush') {
-        addEvent(evLyr, 'events-1', ev.x, ev.y, true);
+        addEvent(evLyr, 'events-1', ev.x, ev.y, ev);
       } else if (ev.id === 'hole') {
-        addEvent(evLyr, 'events-2', ev.x, ev.y);
+        addEvent(evLyr, 'events-2', ev.x, ev.y, ev);
       }
     });
     dMap.addChild(evLyr);
   }
 
+  stage.addChildAt(dMap, 0);
 
-  stage.addChild(dMap);
   if (upLyr) stage.addChild(upLyr);
   MAPWIDTH = map.data.bottom[0].length * SIZE;
   MAPHEIGHT = map.data.bottom.length * SIZE;
 }
 
-function addEvent(lyr, key, x, y, collidable) {
+function addEvent(lyr, key, x, y, ev) {
   x = x || 0;
   y = y || 0;
 
@@ -160,9 +207,16 @@ function addEvent(lyr, key, x, y, collidable) {
   spr.position.x = x * SIZE;
   spr.position.y = y * SIZE;
 
-  if (collidable) {
+  if (ev) {
     map.data.middle[y] = map.data.middle[y] || [];
     map.data.middle[y][x] = true;
+    if (_.isNumber(+ev.d_x) || _.isNumber(+ev.d_y)) {
+      map.data.middle[y][x] = {
+        id: ev.d_id,
+        x: +ev.d_x,
+        y: +ev.d_y
+      };
+    }
   }
 
   lyr.addChild(spr);
@@ -262,7 +316,10 @@ function collides(x, y) {
       var m = map.data.middle[i][j];
       if (m === null || m === undefined) continue;
       if (m < 0 || m > 70) continue;
-      if (checkTile(x, y, PSIZE, PSIZE, j * SIZE, i * SIZE, SIZE, SIZE)) return true;
+      if (checkTile(x, y, PSIZE, PSIZE, j * SIZE, i * SIZE, SIZE, SIZE)) {
+        if (_.isObject(m)) resetMap(m.id, m.x, m.y);
+        return true;
+      }
     }
   }
   return false;
