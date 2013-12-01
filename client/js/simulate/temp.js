@@ -210,7 +210,7 @@ function addEvent(lyr, key, x, y, ev) {
   if (ev) {
     map.data.middle[y] = map.data.middle[y] || [];
     map.data.middle[y][x] = true;
-    if (_.isNumber(+ev.d_x) || _.isNumber(+ev.d_y)) {
+    if (!_.isNaN(+ev.d_x) || !_.isNaN(+ev.d_y)) {
       map.data.middle[y][x] = {
         id: ev.d_id,
         x: +ev.d_x,
@@ -345,20 +345,25 @@ function render() {
   if (MAPWIDTH < WIDTH) {
     var offset = (WIDTH - MAPWIDTH) / 2;
     dMap.position.x = offset;
+    upLyr.position.x = offset;
     player.spr.position.x = offset + Math.floor(playerX);
   } else if (MAPWIDTH == WIDTH) {
     dMap.position.x = 0;
+    upLyr.position.x = 0;
     player.spr.position.x = Math.floor(playerX);
   } else {
     var midPoint = WIDTH / 2;
     if (playerX < midPoint) {
       dMap.position.x = 0;
+      upLyr.position.x = 0;
       player.spr.position.x = Math.floor(playerX);
     } else if (playerX > MAPWIDTH - midPoint) {
       dMap.position.x = WIDTH - MAPWIDTH;
+      upLyr.position.x = WIDTH - MAPWIDTH;
       player.spr.position.x = Math.floor(WIDTH + playerX - MAPWIDTH);
     } else {
       dMap.position.x = midPoint - playerX;
+      upLyr.position.x = midPoint - playerX;
       player.spr.position.x = midPoint;
     }
   }
@@ -366,20 +371,25 @@ function render() {
   if (MAPHEIGHT < HEIGHT) {
     var offset = (HEIGHT - MAPHEIGHT) / 2;
     dMap.position.y = offset;
+    upLyr.position.y = offset;
     player.spr.position.y = offset + Math.floor(playerY);
   } else if (MAPHEIGHT == HEIGHT) {
     dMap.position.y = 0;
+    upLyr.position.y = 0;
     player.spr.position.y = Math.floor(playerY);
   } else {
     var midPoint = HEIGHT / 2;
     if (playerY < midPoint) {
       dMap.position.y = 0;
+      upLyr.position.y = 0;
       player.spr.position.y = Math.floor(playerY);
     } else if (playerY > MAPHEIGHT - midPoint) {
       dMap.position.y = HEIGHT - MAPHEIGHT;
+      upLyr.position.y = HEIGHT - MAPHEIGHT;
       player.spr.position.y = Math.floor(HEIGHT + playerY - MAPHEIGHT);
     } else {
       dMap.position.y = midPoint - playerY;
+      upLyr.position.y = midPoint - playerY;
       player.spr.position.y = midPoint;
     }
   }
